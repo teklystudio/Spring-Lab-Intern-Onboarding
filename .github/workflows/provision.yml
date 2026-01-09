@@ -65,6 +65,23 @@ jobs:
                 permission: 'push' 
               });
               console.log(`✅ User @${user} added to repo.`);
+              // Step 2a: Add the "Intern Leads" Team to the repo
+              // This gives Leads access to merge PRs, but ONLY for this specific repo
+              try {
+                const leadsTeamSlug = 'intern-leads'; 
+                
+                await github.rest.teams.addOrUpdateRepoPermissionsInOrg({
+                  org: org,
+                  team_slug: leadsTeamSlug,
+                  owner: org,
+                  repo: newRepoName,
+                  permission: 'maintain' // 'maintain' = Write + Settings (is best for Leads)
+                });
+                console.log(`✅ Team ${leadsTeamSlug} added to repo.`);
+              } catch (teamError) {
+                console.log(`⚠️ Could not add Intern Leads team: ${teamError.message}`);
+                // Don't crash the whole script if this fails, just log it
+              }
 
               // Step 3: Attempt to Invite to Organization
               try {
